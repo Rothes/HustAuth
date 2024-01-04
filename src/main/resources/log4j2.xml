@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO" shutdownHook="disable">
+    <Appenders>
+        <Console name="LogToConsole" target="SYSTEM_OUT">
+            <PatternLayout pattern="\r[%d{HH:mm:ss} %level]: %msg%n"/>
+        </Console>
+        <GuiConsoleAppender name="LogToGuiConsole">
+            <PatternLayout pattern="[%d{HH:mm:ss} %level]: %msg%n"/>
+        </GuiConsoleAppender>
+        <RollingRandomAccessFile name="LogToRollingRandomAccessFile" fileName="logs/latest.log"
+                                 filePattern="logs/%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %m%n" />
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <OnStartupTriggeringPolicy />
+            </Policies>
+            <DefaultRolloverStrategy max="1000"/>
+        </RollingRandomAccessFile>
+<!--        <File name="VerboseLog" fileName="logs/debug.log" append="false">-->
+<!--            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %m%n" />-->
+<!--        </File>-->
+
+        <Async name="Async">
+            <AppenderRef ref="rewrite"/>
+        </Async>
+        <Rewrite name="rewrite">
+            <AppenderRef ref="LogToConsole"/>
+            <AppenderRef ref="LogToGuiConsole"/>
+            <AppenderRef ref="LogToRollingRandomAccessFile"/>
+        </Rewrite>
+
+        <Async name="AsyncDebug">
+            <AppenderRef ref="LogToRollingRandomAccessFile"/>
+        </Async>
+
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+<!--            <AppenderRef ref="VerboseLog"/>-->
+            <AppenderRef ref="Async"/>
+        </Root>
+        <Logger name="debug" level="debug" additivity="false">
+            <AppenderRef ref="AsyncDebug"/>
+        </Logger>
+        <Logger name="consoleGui">
+            <AppenderRef ref="LogToGuiConsole"/>
+        </Logger>
+    </Loggers>
+</Configuration>
