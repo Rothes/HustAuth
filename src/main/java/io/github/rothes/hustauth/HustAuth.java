@@ -1,19 +1,14 @@
 package io.github.rothes.hustauth;
 
-import com.sun.tools.sjavac.Log;
-import com.sun.tools.sjavac.server.log.LoggingOutputStream;
-import io.github.rothes.hustauth.auth.AuthTaskScheduler;
-import io.github.rothes.hustauth.config.ConfigData;
-import io.github.rothes.hustauth.config.ConfigManager;
 import io.github.rothes.hustauth.auth.AuthHandler;
 import io.github.rothes.hustauth.auth.AuthTask;
+import io.github.rothes.hustauth.auth.AuthTaskScheduler;
+import io.github.rothes.hustauth.config.ConfigManager;
 import io.github.rothes.hustauth.gui.ConsoleGui;
 import io.github.rothes.hustauth.gui.GuiManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.LoggerConfig;
 
-import java.io.PrintStream;
 import java.time.LocalTime;
 import java.util.Locale;
 import java.util.Scanner;
@@ -26,7 +21,7 @@ public class HustAuth {
     private boolean stopping = false;
 
     private HustAuth() {
-        reload();
+        // private
     }
 
     public void reload() {
@@ -35,19 +30,19 @@ public class HustAuth {
     }
 
     public void start() {
+        reload();
         HustAuth.log("正在初始化界面.");
         GuiManager.initGuis();
         HustAuth.log("正在启动应用...");
-        ConfigData configData = getConfigManager().getConfigData();
-        if (configData.dailyLogin) {
+        if (getConfigManager().getConfigData().dailyLogin) {
             AuthTaskScheduler.schedule();
         }
 
-        if (configData.loginOnLaunch) {
+        if (getConfigManager().getConfigData().loginOnLaunch) {
             HustAuth.log("开始首次执行登入任务.");
             LocalTime now = LocalTime.now();
-            AuthTask.runNew(now.getHour() <= configData.loginOnLaunchOnce / 60
-                    && now.getMinute() < configData.loginOnLaunchOnce % 60);
+            AuthTask.runNew(now.getHour() <= getConfigManager().getConfigData().loginOnLaunchOnce / 60
+                    && now.getMinute() < getConfigManager().getConfigData().loginOnLaunchOnce % 60);
         }
 
         while (!stopping) {
