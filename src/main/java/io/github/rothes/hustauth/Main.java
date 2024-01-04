@@ -15,7 +15,7 @@ public class Main {
                     .getCodeSource().getLocation()
                     .toURI().getPath()
                     .replace('/', File.separator.charAt(0)).substring(1);
-            Runtime.getRuntime().exec("javaw -Xmx13312k -jar " + currentPath + " restart");
+            Runtime.getRuntime().exec("javaw -Xmx13312k -jar \"" + currentPath + "\" restart");
             return;
         }
 
