@@ -28,10 +28,11 @@ public class AuthTask {
                 }
 
                 HustAuth.log("正在尝试登入校园网...");
-                if (AuthHandler.login().isSuccess()) {
+                AuthHandler.Result login = AuthHandler.login();
+                if (login.isSuccess()) {
                     HustAuth.log("成功登录校园网, 登入任务完成.");
                 } else {
-                    HustAuth.log("登入校园网失败, 请检查账户信息; 登入任务终止.");
+                    HustAuth.log("登入校园网失败, " + login.getMessage() + "; 登入任务终止.");
                 }
                 stop();
             }
