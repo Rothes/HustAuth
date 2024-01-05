@@ -11,3 +11,9 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-core:2.22.1")
     annotationProcessor("org.apache.logging.log4j:log4j-core:2.22.1")
 }
+
+tasks.compileJava {
+    options.encoding = "UTF-8"
+    sourceCompatibility = "8"
+    targetCompatibility = "8"
+}
