@@ -14,11 +14,12 @@ public class GuiManager {
     static {
         Font[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
         Font tempFont;
+        float size = HustAuth.INS.getConfigManager().getConfigData().guiFontSize;
 
         tempFont = Arrays.stream(fonts).filter(it -> it.getFontName(Locale.ENGLISH).equals("Sarasa UI SC")).findAny()
                 .orElse(Arrays.stream(fonts).filter(it -> it.getFontName(Locale.ENGLISH).equals("Microsoft YaHei")).findAny().orElse(null));
         if (tempFont != null) {
-            tempFont = tempFont.deriveFont(12f);
+            tempFont = tempFont.deriveFont(size);
         }
         uiFont = tempFont;
 
@@ -26,7 +27,7 @@ public class GuiManager {
             .orElse(Arrays.stream(fonts).filter(it -> it.getFontName(Locale.ENGLISH).equals("Cascadia Mono")).findAny()
                     .orElse(Arrays.stream(fonts).filter(it -> it.getFontName(Locale.ENGLISH).equals("Consolas")).findAny().orElse(null)));
         if (tempFont != null) {
-            tempFont = tempFont.deriveFont(12f);
+            tempFont = tempFont.deriveFont(size);
         }
         monoFont = tempFont;
     }

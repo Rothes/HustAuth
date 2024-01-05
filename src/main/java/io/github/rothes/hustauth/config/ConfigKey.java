@@ -5,6 +5,7 @@ public enum ConfigKey {
     DEBUG(false, "记录 debug 日志到 debug.log 中"),
     SHOW_CONSOLE_ON_LAUNCH(true, "启动应用时显示控制台窗口, 可设为 false 在托盘图标中手动打开"),
     CONSOLE_MAX_RECORDS(100, "控制台窗口保留多少行日志记录"),
+    GUI_FONT_SIZE(14, "GUI 界面字体大小"),
     AUTH_LINK("http://123.123.123.123/", "校园网 Web eportal 认证链接"),
     USER_ID("user", "用户名"),
     PASSWORD("password", "密码, 明文或密文均在此处填写"),

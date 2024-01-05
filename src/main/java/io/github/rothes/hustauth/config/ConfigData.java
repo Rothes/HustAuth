@@ -7,6 +7,7 @@ public class ConfigData {
     public final boolean debug;
     public final boolean showConsoleOnLaunch;
     public final int consoleMaxRecords;
+    public final float guiFontSize;
 
     public final String authLink;
     public final String userId;
@@ -28,6 +29,7 @@ public class ConfigData {
         debug = getBoolean(ConfigKey.DEBUG);
         showConsoleOnLaunch = getBoolean(ConfigKey.SHOW_CONSOLE_ON_LAUNCH);
         consoleMaxRecords = getInt(ConfigKey.CONSOLE_MAX_RECORDS);
+        guiFontSize = getFloat(ConfigKey.GUI_FONT_SIZE);
         authLink = correctLink(getString(ConfigKey.AUTH_LINK));
         userId = getString(ConfigKey.USER_ID);
         password = getString(ConfigKey.PASSWORD);
@@ -54,6 +56,10 @@ public class ConfigData {
 
     private long getLong(ConfigKey key) {
         return yamlFile.getLong(key.getPath());
+    }
+
+    private float getFloat(ConfigKey key) {
+        return (float) yamlFile.getDouble(key.getPath());
     }
 
     private static String correctLink(String link) {
