@@ -15,7 +15,7 @@ public enum ConfigKey {
             "加密密码获取方式: 在 Web 登录时记住密码后返回登录界面,\n" +
             "F12 控制台内执行 document.getElementById(\"pwd\").value"),
     LOGIN_ON_LAUNCH(true, "启动程序时执行自动登入任务"),
-    LOGIN_ON_LAUNCH_ONCE(5, "在每日开始的多少分钟内启动程序时, 要求必须成功登入一次."),
+    LOGIN_ON_LAUNCH_ONCE(3, "在每日开始的多少分钟内启动程序时, 要求必须成功登入一次."),
     DAILY_LOGIN(true, "自动在每日 00:00 时执行自动登入任务"),
     LOGIN_INTERVAL(1000, "每多少毫秒尝试执行一次登入操作"),
     GET_USER_INFO_INTERVAL(50, "获取用户状态信息返回等待时, 再次获取状态的间隔毫秒数");

@@ -89,6 +89,7 @@ public class HustAuth {
                 return;
             case "STOP":
             case "QUIT":
+            case "END":
                 stop();
                 return;
         }
