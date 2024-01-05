@@ -59,13 +59,10 @@ public class GuiConsoleAppender extends AbstractAppender {
         if ((maxLines > 0) && (textArea.getLineCount() > (maxLines + 1))) {
             String text = textArea.getText();
             int pos = text.indexOf('\n');
-            text = text.substring(pos+1);
+            text = text.substring(pos + 1);
             textArea.setText(text);
         }
         textArea.setCaretPosition(textArea.getDocument().getLength());
-//        scrollPane.validate();
-//        JScrollBar bar = scrollPane.getVerticalScrollBar();
-//        bar.setValue(bar.getMaximum());
     }
 
 }
