@@ -45,6 +45,12 @@ public class HustAuth {
                     && now.getMinute() < getConfigManager().getConfigData().loginOnLaunchOnce % 60);
         }
 
+        if (System.console() != null) {
+            commandLineInterface();
+        }
+    }
+
+    public void commandLineInterface() {
         while (!stopping) {
             inputCommand();
         }
