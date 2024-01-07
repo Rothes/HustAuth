@@ -47,7 +47,7 @@ public class AuthHandler {
                     return AuthStatus.NOT_AUTHENTICATED;
             }
         }
-        HustAuth.error("认证系统重定向至未知网页");
+        HustAuth.error("认证系统重定向至未知网页: " + location);
         throw new AssertionError("认证系统重定向至未知网页");
     }
 
