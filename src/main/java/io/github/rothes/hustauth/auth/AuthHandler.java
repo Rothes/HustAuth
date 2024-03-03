@@ -66,9 +66,6 @@ public class AuthHandler {
                 JsonObject json = JsonParser.parseString(responseJson).getAsJsonObject();
                 String result = json.getAsJsonPrimitive("result").getAsString();
                 String message = json.getAsJsonPrimitive("message").getAsString();
-//                if (!message.isEmpty()) {
-//                    HustAuth.log("登入操作返回信息: " + message);
-//                }
                 return new Result(result.equals("success"), message);
             });
         } catch (IOException e) {
@@ -87,9 +84,6 @@ public class AuthHandler {
                 JsonObject json = JsonParser.parseString(responseJson).getAsJsonObject();
                 String result = json.getAsJsonPrimitive("result").getAsString();
                 String message = json.getAsJsonPrimitive("message").getAsString();
-//                if (!message.isEmpty()) {
-//                    HustAuth.log("下线操作返回信息: " + message);
-//                }
                 return new Result(result.equals("success"), message);
             });
         } catch (IOException e) {
@@ -103,11 +97,6 @@ public class AuthHandler {
         if (userInfo != null) {
             String result = userInfo.getAsJsonPrimitive("result").getAsString();
             if (!result.equals("wait") && !equals(userInfo, "userGroup", "获取失败")) {
-//                String message = userInfo.getAsJsonPrimitive("message").getAsString();
-//                if (!message.isEmpty()) {
-//                    HustAuth.log("用户状态信息: " + message);
-//                    // 获取用户信息失败，用户可能已经下线 : We can re-login now.
-//                }
                 return result.equals("success");
             }
         }
@@ -123,7 +112,11 @@ public class AuthHandler {
     }
 
     public static JsonObject getUserInfo() {
-        return getUserInfo(getFinalLocation());
+        URI finalUri = getFinalLocation();
+        if (finalUri == null) {
+            return null;
+        }
+        return getUserInfo(finalUri);
     }
 
     public static JsonObject getUserInfo(URI finalUri) {
