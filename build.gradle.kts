@@ -43,6 +43,7 @@ launch4j {
     jreMinVersion = "8"
     windowTitle = "HustAuth"
     maxHeapSize = 18 // limit value : 14
+    initialHeapSize = 1
 }
 
 tasks.createExe {

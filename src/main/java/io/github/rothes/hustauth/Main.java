@@ -15,7 +15,7 @@ public class Main {
                     .getCodeSource().getLocation()
                     .toURI().getPath()
                     .replace('/', File.separator.charAt(0)).substring(1);
-            Runtime.getRuntime().exec("javaw -Xmx18m -jar \"" + currentPath + "\" restart"); // limit is 13312k
+            Runtime.getRuntime().exec("javaw -Xms1m -Xmx18m -jar \"" + currentPath + "\" restart"); // limit is 13312k
             return;
         }
 
