@@ -20,12 +20,12 @@ public class AuthGui {
     public static void show() {
         JFrame frame = new JFrame("HustAuth");
         frame.setFont(GuiManager.getUiFont());
-        fresh(frame);
+        initByStatus(frame);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
-    private static void fresh(JFrame frame) {
+    private static void initByStatus(JFrame frame) {
         switch (AuthHandler.check()) {
             case NOT_AUTHENTICATED:
                 auth(frame);
@@ -50,14 +50,15 @@ public class AuthGui {
         TitledBorder border = new TitledBorder("账户信息");
         form.setBorder(border);
 
-        JComboBox<String> service = new JComboBox<>(new String[]{"系统默认服务"});
         ConfigData configData = HustAuth.INS.getConfigManager().getConfigData();
         List<AccountRecord> list = new ArrayList<>();
         list.add(new AccountRecord(configData.userId, configData.password, configData.service, configData.passwordEncrypted, configData.userId + " (配置文件)"));
         list.addAll(HustAuth.INS.getDbSource().getRecords());
         JComboBox<AccountRecord> userId = new JComboBox<>(list.toArray(new AccountRecord[0]));
+        JTextComponent userText = (JTextComponent) userId.getEditor().getEditorComponent();
         userId.setEditable(true);
         JPasswordField password = new JPasswordField();
+        ServiceComboBox service = new ServiceComboBox(userText);
         JCheckBox encrypted = new CustomCheckBox("密码已加密", "<html>填写的密码是已加密的密码时勾选此项.<br>获取加密密码的方式请参阅 config.yml<br>若您不清楚该内容, 请勿勾选.</html>");
         JCheckBox remember = new CustomCheckBox("记住账户", "保存账户信息到本地数据库, 下次登入时可自动填写.");
         ToolTipManager.sharedInstance().setDismissDelay(30000);
@@ -79,13 +80,13 @@ public class AuthGui {
                 AccountRecord record = (AccountRecord) userId.getSelectedItem();
                 userId.setSelectedItem(record.getUserId());
                 password.setText(record.getPassword());
+                service.update();
                 service.setSelectedItem(record.getService());
                 encrypted.setSelected(record.isEncrypted());
                 remember.setSelected(record.toString().equals(record.getUserId()));
             }
         });
         userId.setSelectedIndex(0);
-        JTextComponent userText = (JTextComponent) userId.getEditor().getEditorComponent();
         userText.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
@@ -104,14 +105,7 @@ public class AuthGui {
             }
 
             public void updateServices() {
-                String[] services = AuthHandler.getServices(userText.getText());
-                if (services.length == 1 && services[0].isEmpty()) {
-                    services = new String[]{"系统默认服务"};
-                }
-                service.removeAllItems();
-                for (String s : services) {
-                    service.addItem(s);
-                }
+                service.update();
             }
         });
         form.add(label("用户名"));
@@ -134,11 +128,11 @@ public class AuthGui {
             AuthHandler.Result result = AuthHandler.login(userText.getText(), new String(password.getPassword()), (String) service.getSelectedItem(), encrypted.isSelected());
             if (result.isSuccess()) {
                 HustAuth.log("已通过 GUI 手动登入");
-                fresh(frame);
-                SwingUtilities.updateComponentTreeUI(frame);
                 if (remember.isSelected()) {
                     HustAuth.INS.getDbSource().addRecord(new AccountRecord(userText.getText(), new String(password.getPassword()), (String) service.getSelectedItem(), encrypted.isSelected()));
                 }
+                frame.dispose();
+                show();
             } else {
                 HustAuth.log("通过 GUI 手动登入失败, " + result.getMessage());
                 JOptionPane.showMessageDialog(frame, "登入失败,\n" + result.getMessage(), "HustAuth 快捷认证", JOptionPane.ERROR_MESSAGE);
@@ -171,8 +165,8 @@ public class AuthGui {
             AuthHandler.Result result = AuthHandler.logOut();
             if (result.isSuccess()) {
                 HustAuth.log("已通过 GUI 手动下线");
-                fresh(frame);
-                SwingUtilities.updateComponentTreeUI(frame);
+                frame.dispose();
+                show();
             } else {
                 HustAuth.log("通过 GUI 手动下线失败, " + result.getMessage());
                 JOptionPane.showMessageDialog(frame, "下线失败,\n" + result.getMessage(), "HustAuth 快捷认证", JOptionPane.ERROR_MESSAGE);
@@ -218,6 +212,28 @@ public class AuthGui {
         @Override
         public Font getFont() {
             return GuiManager.getUiFont();
+        }
+
+    }
+
+    private static class ServiceComboBox extends JComboBox<String> {
+
+        private final JTextComponent textComponent;
+
+        public ServiceComboBox(JTextComponent textComponent) {
+            super(new String[]{"系统默认服务"});
+            this.textComponent = textComponent;
+        }
+
+        public void update() {
+            String[] services = AuthHandler.getServices(textComponent.getText());
+            if (services.length == 1 && services[0].isEmpty()) {
+                services = new String[]{"系统默认服务"};
+            }
+            removeAllItems();
+            for (String s : services) {
+                addItem(s);
+            }
         }
 
     }
