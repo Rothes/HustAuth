@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.github.rothes"
-version = "1.0.0"
+version = "1.0.1"
 
 repositories {
     mavenLocal()
@@ -24,6 +24,7 @@ dependencies {
 //    implementation("org.apache.httpcomponents.client5:httpclient5:5.3")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.github.Carleslc.Simple-YAML:Simple-Yaml:1.8.4")
+    implementation("org.xerial:sqlite-jdbc:3.44.1.0")
 }
 
 tasks.shadowJar {
@@ -41,7 +42,7 @@ launch4j {
 //    headerType = "console"
     jreMinVersion = "8"
     windowTitle = "HustAuth"
-    maxHeapSize = 13
+    maxHeapSize = 18 // limit value : 14
 }
 
 tasks.createExe {

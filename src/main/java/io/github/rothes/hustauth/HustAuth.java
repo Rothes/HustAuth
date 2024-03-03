@@ -6,6 +6,7 @@ import io.github.rothes.hustauth.auth.AuthTaskScheduler;
 import io.github.rothes.hustauth.config.ConfigManager;
 import io.github.rothes.hustauth.gui.ConsoleGui;
 import io.github.rothes.hustauth.gui.GuiManager;
+import io.github.rothes.hustauth.storage.DbSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,6 +19,7 @@ public class HustAuth {
     private static final Logger LOGGER = LogManager.getRootLogger();
     public static final HustAuth INS = new HustAuth();
     private final ConfigManager configManager = ConfigManager.INS;
+    private final DbSource dbSource = new DbSource();
     private boolean stopping = false;
 
     private HustAuth() {
@@ -33,6 +35,8 @@ public class HustAuth {
         reload();
         HustAuth.log("正在初始化界面.");
         GuiManager.initGuis();
+        HustAuth.log("正在初始化数据库.");
+        getDbSource().createTable();
         HustAuth.log("正在启动应用...");
         if (getConfigManager().getConfigData().dailyLogin) {
             AuthTaskScheduler.schedule();
@@ -48,6 +52,10 @@ public class HustAuth {
         if (System.console() != null) {
             commandLineInterface();
         }
+    }
+
+    public DbSource getDbSource() {
+        return dbSource;
     }
 
     public void commandLineInterface() {

@@ -12,7 +12,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
-import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +22,6 @@ public class AuthGui {
         frame.setFont(GuiManager.getUiFont());
         fresh(frame);
         frame.setVisible(true);
-        frame.setBounds(0,0,240,260);
-        frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
@@ -42,6 +39,8 @@ public class AuthGui {
     }
 
     private static void auth(JFrame frame) {
+        frame.setBounds(0,0,240,300);
+        frame.setLocationRelativeTo(null);
         JPanel panel = commonPanel();
         JLabel title = new JLabel("登入", SwingConstants.CENTER);
         panel.add(title, BorderLayout.NORTH);
@@ -59,8 +58,9 @@ public class AuthGui {
         JComboBox<AccountRecord> userId = new JComboBox<>(list.toArray(new AccountRecord[0]));
         userId.setEditable(true);
         JPasswordField password = new JPasswordField();
-        JCheckBox encrypted = new JCheckBox("密码已加密");
-        JCheckBox remember = new JCheckBox("记住账户");
+        JCheckBox encrypted = new CustomCheckBox("密码已加密", "<html>填写的密码是已加密的密码时勾选此项.<br>获取加密密码的方式请参阅 config.yml<br>若您不清楚该内容, 请勿勾选.</html>");
+        JCheckBox remember = new CustomCheckBox("记住账户", "保存账户信息到本地数据库, 下次登入时可自动填写.");
+        ToolTipManager.sharedInstance().setDismissDelay(30000);
 
         border.setTitleFont(GuiManager.getUiFont());
         title.setFont(GuiManager.getUiFont().deriveFont(18f));
@@ -74,18 +74,18 @@ public class AuthGui {
         userId.setMaximumSize(new Dimension(Integer.MAX_VALUE, userId.getPreferredSize().height));
         userId.setAlignmentX(JComboBox.LEFT_ALIGNMENT);
         password.setMaximumSize(new Dimension(Integer.MAX_VALUE, password.getPreferredSize().height));
-        JTextComponent userText = (JTextComponent) userId.getEditor().getEditorComponent();
-        userId.addItemListener(event -> {
-            if (event.getStateChange() == ItemEvent.SELECTED) {
-                AccountRecord record = (AccountRecord) event.getItem();
-                userText.setText(record.getUserId());
+        userId.addActionListener(event -> {
+            if (userId.getSelectedItem() instanceof AccountRecord) {
+                AccountRecord record = (AccountRecord) userId.getSelectedItem();
+                userId.setSelectedItem(record.getUserId());
                 password.setText(record.getPassword());
                 service.setSelectedItem(record.getService());
                 encrypted.setSelected(record.isEncrypted());
-                remember.setSelected(true);
+                remember.setSelected(record.toString().equals(record.getUserId()));
             }
         });
-        userId.setSelectedIndex(0); // TODO
+        userId.setSelectedIndex(0);
+        JTextComponent userText = (JTextComponent) userId.getEditor().getEditorComponent();
         userText.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
@@ -120,6 +120,12 @@ public class AuthGui {
         form.add(password);
         form.add(label("服务"));
         form.add(service);
+        Box checkBox = Box.createHorizontalBox();
+        checkBox.setAlignmentX(JComboBox.LEFT_ALIGNMENT);
+        checkBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, password.getPreferredSize().height));
+        checkBox.add(encrypted);
+        checkBox.add(remember);
+        form.add(checkBox);
         panel.add(form, BorderLayout.CENTER);
 
         JButton button = new JButton("登入");
@@ -143,6 +149,8 @@ public class AuthGui {
     }
 
     private static void loggedIn(JFrame frame) {
+        frame.setBounds(0,0,240,260);
+        frame.setLocationRelativeTo(null);
         JPanel panel = commonPanel();
         JLabel title = new JLabel("已登入", SwingConstants.CENTER);
         title.setFont(GuiManager.getUiFont().deriveFont(18f));
@@ -188,6 +196,30 @@ public class AuthGui {
         label.setAlignmentX(JLabel.LEFT_ALIGNMENT);
         label.setFont(GuiManager.getUiFont());
         return label;
+    }
+
+    private static class CustomCheckBox extends JCheckBox {
+
+        public CustomCheckBox(String text, String toolTip) {
+            super(text);
+            setToolTipText(toolTip);
+        }
+
+        @Override
+        public JToolTip createToolTip() {
+            return new JToolTip() {
+                @Override
+                public Font getFont() {
+                    return GuiManager.getUiFont();
+                }
+            };
+        }
+
+        @Override
+        public Font getFont() {
+            return GuiManager.getUiFont();
+        }
+
     }
 
 }
