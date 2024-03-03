@@ -1,6 +1,7 @@
 package io.github.rothes.hustauth.gui;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import io.github.rothes.hustauth.HustAuth;
 import io.github.rothes.hustauth.auth.AuthHandler;
 import io.github.rothes.hustauth.config.ConfigData;
@@ -143,7 +144,7 @@ public class AuthGui {
     }
 
     private static void loggedIn(JFrame frame) {
-        frame.setBounds(0,0,240,260);
+        frame.setBounds(0,0,240,280);
         frame.setLocationRelativeTo(null);
         JPanel panel = commonPanel();
         JLabel title = new JLabel("已登入", SwingConstants.CENTER);
@@ -152,8 +153,12 @@ public class AuthGui {
 
         JsonObject userInfo = AuthHandler.getUserInfo();
         JLabel info = new JLabel("<html><table>" +
-                "<tr><td>用户ID:</td><td>" + userInfo.getAsJsonPrimitive("userId").getAsString() + "</td>" +
-                "<tr><td>服务名:</td><td>" + userInfo.getAsJsonPrimitive("service").getAsString() + "</td>" +
+                "<tr><td>用户ID:</td><td>" + getString(userInfo, "userId") + "</td>" +
+                "<tr><td>用户名:</td><td>" + getString(userInfo, "userName") + "</td>" +
+                "<tr><td>服务名:</td><td>" + getString(userInfo, "service") + "</td>" +
+                "<tr><td>用户组:</td><td>" + getString(userInfo, "userGroup") + "</td>" +
+                "<tr><td>MAC:</td><td>" + getString(userInfo, "userMac") + "</td>" +
+                "<tr><td>IP:</td><td>" + getString(userInfo, "userIp") + "</td>" +
                 "</table></html>",
                 SwingConstants.CENTER);
         info.setFont(GuiManager.getUiFont());
@@ -174,6 +179,14 @@ public class AuthGui {
         });
         panel.add(button, BorderLayout.SOUTH);
         frame.setContentPane(panel);
+    }
+
+    private static String getString(JsonObject jsonObject, String key) {
+        JsonPrimitive jsonPrimitive = jsonObject.getAsJsonPrimitive(key);
+        if (jsonPrimitive == null) {
+            return null;
+        }
+        return jsonPrimitive.getAsString();
     }
 
     private static JPanel commonPanel() {
