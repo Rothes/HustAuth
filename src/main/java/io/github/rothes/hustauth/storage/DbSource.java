@@ -47,7 +47,7 @@ public class DbSource {
                 Statement statement = connection.createStatement()
                 ) {
             statement.execute("CREATE TABLE IF NOT EXISTS account_records (" +
-                    "userId VARCHAR(32)," +
+                    "user_id VARCHAR(32)," +
                     "password VARCHAR(256)," +
                     "service VARCHAR(32)," +
                     "encrypted INTEGER" +
@@ -77,7 +77,7 @@ public class DbSource {
         deleteRecord(record);
         try (
                 Connection connection = getConnection();
-                PreparedStatement statement = connection.prepareStatement("INSERT INTO account_records (userId, password, service, encrypted) VALUES (?, ?, ?, ?)")
+                PreparedStatement statement = connection.prepareStatement("INSERT INTO account_records (user_id, password, service, encrypted) VALUES (?, ?, ?, ?)")
         ) {
             statement.setString(1, record.getUserId());
             statement.setString(2, record.getPassword());
@@ -92,7 +92,7 @@ public class DbSource {
     public void deleteRecord(AccountRecord record) {
         try (
                 Connection connection = getConnection();
-                PreparedStatement statement = connection.prepareStatement("DELETE FROM account_records WHERE userId = ?")
+                PreparedStatement statement = connection.prepareStatement("DELETE FROM account_records WHERE user_id = ?")
         ) {
             statement.setString(1, record.getUserId());
             statement.executeUpdate();
