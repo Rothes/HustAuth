@@ -19,7 +19,7 @@ public class TrayIconGui {
             URL url = Main.class.getClassLoader().getResource("tray_icon.png");
             PopupMenu popupMenu = new PopupMenu("HustAuthMenu");
             popupMenu.add(menuItem("控制台", e -> ConsoleGui.show()));
-            popupMenu.add(menuItem("手动认证", e -> AuthGui.show()));
+            popupMenu.add(menuItem("快捷认证", e -> AuthGui.show()));
             popupMenu.add(menuItem("重载配置", e -> HustAuth.INS.reload()));
             popupMenu.addSeparator();
             popupMenu.add(menuItem("退出", e -> HustAuth.INS.stop()));

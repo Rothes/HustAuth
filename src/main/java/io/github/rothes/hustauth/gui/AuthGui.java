@@ -3,12 +3,18 @@ package io.github.rothes.hustauth.gui;
 import com.google.gson.JsonObject;
 import io.github.rothes.hustauth.HustAuth;
 import io.github.rothes.hustauth.auth.AuthHandler;
+import io.github.rothes.hustauth.config.ConfigData;
+import io.github.rothes.hustauth.storage.AccountRecord;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AuthGui {
 
@@ -38,27 +44,49 @@ public class AuthGui {
     private static void auth(JFrame frame) {
         JPanel panel = commonPanel();
         JLabel title = new JLabel("登入", SwingConstants.CENTER);
-        title.setFont(GuiManager.getUiFont().deriveFont(18f));
         panel.add(title, BorderLayout.NORTH);
 
         JPanel form = new JPanel();
-        BoxLayout boxLayout = new BoxLayout(form, BoxLayout.Y_AXIS);
-        form.setLayout(boxLayout);
+        form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
         TitledBorder border = new TitledBorder("账户信息");
-        border.setTitleFont(GuiManager.getUiFont());
         form.setBorder(border);
 
         JComboBox<String> service = new JComboBox<>(new String[]{"系统默认服务"});
+        ConfigData configData = HustAuth.INS.getConfigManager().getConfigData();
+        List<AccountRecord> list = new ArrayList<>();
+        list.add(new AccountRecord(configData.userId, configData.password, configData.service, configData.passwordEncrypted, configData.userId + " (配置文件)"));
+        list.addAll(HustAuth.INS.getDbSource().getRecords());
+        JComboBox<AccountRecord> userId = new JComboBox<>(list.toArray(new AccountRecord[0]));
+        userId.setEditable(true);
+        JPasswordField password = new JPasswordField();
+        JCheckBox encrypted = new JCheckBox("密码已加密");
+        JCheckBox remember = new JCheckBox("记住账户");
+
+        border.setTitleFont(GuiManager.getUiFont());
+        title.setFont(GuiManager.getUiFont().deriveFont(18f));
         service.setFont(GuiManager.getUiFont());
+        userId.setFont(GuiManager.getUiFont());
+        password.setFont(GuiManager.getUiFont());
+        encrypted.setFont(GuiManager.getUiFont());
+        remember.setFont(GuiManager.getUiFont());
         service.setMaximumSize(new Dimension(Integer.MAX_VALUE, service.getPreferredSize().height));
         service.setAlignmentX(JComboBox.LEFT_ALIGNMENT);
-        JTextField userId = new JTextField();
-        userId.setFont(GuiManager.getUiFont());
         userId.setMaximumSize(new Dimension(Integer.MAX_VALUE, userId.getPreferredSize().height));
-        JPasswordField password = new JPasswordField();
-        password.setFont(GuiManager.getUiFont());
+        userId.setAlignmentX(JComboBox.LEFT_ALIGNMENT);
         password.setMaximumSize(new Dimension(Integer.MAX_VALUE, password.getPreferredSize().height));
-        userId.getDocument().addDocumentListener(new DocumentListener() {
+        JTextComponent userText = (JTextComponent) userId.getEditor().getEditorComponent();
+        userId.addItemListener(event -> {
+            if (event.getStateChange() == ItemEvent.SELECTED) {
+                AccountRecord record = (AccountRecord) event.getItem();
+                userText.setText(record.getUserId());
+                password.setText(record.getPassword());
+                service.setSelectedItem(record.getService());
+                encrypted.setSelected(record.isEncrypted());
+                remember.setSelected(true);
+            }
+        });
+        userId.setSelectedIndex(0); // TODO
+        userText.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -76,7 +104,7 @@ public class AuthGui {
             }
 
             public void updateServices() {
-                String[] services = AuthHandler.getServices(userId.getText());
+                String[] services = AuthHandler.getServices(userText.getText());
                 if (services.length == 1 && services[0].isEmpty()) {
                     services = new String[]{"系统默认服务"};
                 }
@@ -97,14 +125,17 @@ public class AuthGui {
         JButton button = new JButton("登入");
         button.setFont(GuiManager.getUiFont());
         button.addActionListener(e -> {
-            AuthHandler.Result result = AuthHandler.login(userId.getText(), new String(password.getPassword()), (String) service.getSelectedItem(), false);
+            AuthHandler.Result result = AuthHandler.login(userText.getText(), new String(password.getPassword()), (String) service.getSelectedItem(), encrypted.isSelected());
             if (result.isSuccess()) {
                 HustAuth.log("已通过 GUI 手动登入");
                 fresh(frame);
                 SwingUtilities.updateComponentTreeUI(frame);
+                if (remember.isSelected()) {
+                    HustAuth.INS.getDbSource().addRecord(new AccountRecord(userText.getText(), new String(password.getPassword()), (String) service.getSelectedItem(), encrypted.isSelected()));
+                }
             } else {
                 HustAuth.log("通过 GUI 手动登入失败, " + result.getMessage());
-                JOptionPane.showMessageDialog(frame, "登入失败,\n" + result.getMessage(), "HustAuth 手动认证", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "登入失败,\n" + result.getMessage(), "HustAuth 快捷认证", JOptionPane.ERROR_MESSAGE);
             }
         });
         panel.add(button, BorderLayout.SOUTH);
@@ -136,7 +167,7 @@ public class AuthGui {
                 SwingUtilities.updateComponentTreeUI(frame);
             } else {
                 HustAuth.log("通过 GUI 手动下线失败, " + result.getMessage());
-                JOptionPane.showMessageDialog(frame, "下线失败,\n" + result.getMessage(), "HustAuth 手动认证", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "下线失败,\n" + result.getMessage(), "HustAuth 快捷认证", JOptionPane.ERROR_MESSAGE);
             }
         });
         panel.add(button, BorderLayout.SOUTH);
@@ -145,7 +176,7 @@ public class AuthGui {
 
     private static JPanel commonPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        TitledBorder border = new TitledBorder("手动认证");
+        TitledBorder border = new TitledBorder("快捷认证");
         border.setTitleFont(GuiManager.getUiFont());
         panel.setBorder(border);
         return panel;
