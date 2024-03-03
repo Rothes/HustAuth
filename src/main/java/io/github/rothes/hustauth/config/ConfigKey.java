@@ -15,6 +15,7 @@ public enum ConfigKey {
             "若密码是明文, 应设为 false . 安全起见, 应存储密文.\n" +
             "加密密码获取方式: 在 Web 登录时记住密码后返回登录界面,\n" +
             "F12 控制台内执行 document.getElementById(\"pwd\").value"),
+    CONNECT_TIMEOUT(5000, "连接超时的等待时间, 单位毫秒"),
     LOGIN_ON_LAUNCH(true, "启动程序时执行自动登入任务"),
     LOGIN_ON_LAUNCH_ONCE(3, "在每日开始的多少分钟内启动程序时, 要求必须成功登入一次."),
     DAILY_LOGIN(true, "自动在每日 00:00 时执行自动登入任务"),

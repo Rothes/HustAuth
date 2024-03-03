@@ -6,12 +6,14 @@ import com.google.gson.JsonParser;
 import io.github.rothes.hustauth.HustAuth;
 import io.github.rothes.hustauth.config.ConfigData;
 import io.github.rothes.hustauth.util.CollectionUtils;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -58,7 +60,7 @@ public class AuthHandler {
 
     public static Result login(String userId, String password, String service, boolean encrypted) {
         try (
-                CloseableHttpClient client = HttpClients.createDefault()
+                CloseableHttpClient client = createClient()
         ) {
             return client.execute(getLoginPost(userId, password, service, encrypted), response -> {
                 String responseJson = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
@@ -76,7 +78,7 @@ public class AuthHandler {
 
     public static Result logOut() {
         try (
-                CloseableHttpClient client = HttpClients.createDefault()
+                CloseableHttpClient client = createClient()
         ) {
             return client.execute(getLogOutPost(), response -> {
                 String responseJson = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
@@ -129,7 +131,7 @@ public class AuthHandler {
                     new BasicNameValuePair("userIndex", finalUri.getRawQuery().split("=")[1])
             )));
             try (
-                CloseableHttpClient client = HttpClients.createDefault()
+                    CloseableHttpClient client = createClient()
             ) {
                 return client.execute(post, response -> {
                     String responseJson = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
@@ -149,7 +151,7 @@ public class AuthHandler {
 
     public static String[] getServices(String user) {
         try (
-                CloseableHttpClient client = HttpClients.createDefault()
+                CloseableHttpClient client = createClient()
         ) {
             return client.execute(getServicesPost(user), response -> {
                 String responseText = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
@@ -174,7 +176,7 @@ public class AuthHandler {
 
         HttpClientContext context = HttpClientContext.create();
         try (
-                CloseableHttpClient client = HttpClients.createDefault();
+                CloseableHttpClient client = createClient();
                 CloseableHttpResponse response = client.execute(new HttpGet(configData.authLink), context)
         ) {
             URI last = CollectionUtils.getLast(context.getRedirectLocations());
@@ -195,6 +197,12 @@ public class AuthHandler {
             HustAuth.error("获取重定向链接时发生异常", e);
             return null;
         }
+    }
+
+    private static CloseableHttpClient createClient() {
+        return HttpClientBuilder.create().setDefaultRequestConfig(
+                RequestConfig.custom().setConnectTimeout(HustAuth.INS.getConfigManager().getConfigData().connectTimeout).build()
+        ).build();
     }
 
     private static HttpPost getLoginPost(String userId, String password, String service, boolean encrypted) {

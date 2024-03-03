@@ -16,6 +16,7 @@ public class ConfigData {
     public final String service;
     public final boolean passwordEncrypted;
 
+    public final int connectTimeout;
     public final boolean loginOnLaunch;
     public final int loginOnLaunchOnce;
     public final boolean dailyLogin;
@@ -37,6 +38,7 @@ public class ConfigData {
         password = getString(ConfigKey.PASSWORD);
         service = getString(ConfigKey.SERVICE);
         passwordEncrypted = getBoolean(ConfigKey.PASSWORD_ENCRYPTED);
+        connectTimeout = getInt(ConfigKey.CONNECT_TIMEOUT);
         loginOnLaunch = getBoolean(ConfigKey.LOGIN_ON_LAUNCH);
         loginOnLaunchOnce = getInt(ConfigKey.LOGIN_ON_LAUNCH_ONCE);
         dailyLogin = getBoolean(ConfigKey.DAILY_LOGIN);
