@@ -2,7 +2,7 @@ package io.github.rothes.hustauth.config;
 
 public enum ConfigKey {
 
-    DEBUG(false, "记录 debug 日志到 debug.log\n警告: 调试内容可能包含隐私信息, 分享前请注意安全."),
+    DEBUG(false, "记录 debug 信息到日志文件\n警告: 调试内容可能包含隐私信息, 分享前请注意安全."),
     VERBOSE(false, "记录详细的操作日志"),
     SHOW_CONSOLE_ON_LAUNCH(true, "启动应用时显示控制台窗口, 可设为 false 在托盘图标中手动打开"),
     CONSOLE_MAX_RECORDS(100, "控制台窗口保留多少行日志记录"),
