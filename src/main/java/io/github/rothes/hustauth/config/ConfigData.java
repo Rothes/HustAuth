@@ -5,6 +5,7 @@ import org.simpleyaml.configuration.file.YamlFile;
 public class ConfigData {
 
     public final boolean debug;
+    public final boolean verbose;
     public final boolean showConsoleOnLaunch;
     public final int consoleMaxRecords;
     public final float guiFontSize;
@@ -27,6 +28,7 @@ public class ConfigData {
         yamlFile = configManager.getYamlFile();
 
         debug = getBoolean(ConfigKey.DEBUG);
+        verbose = getBoolean(ConfigKey.VERBOSE);
         showConsoleOnLaunch = getBoolean(ConfigKey.SHOW_CONSOLE_ON_LAUNCH);
         consoleMaxRecords = getInt(ConfigKey.CONSOLE_MAX_RECORDS);
         guiFontSize = getFloat(ConfigKey.GUI_FONT_SIZE);

@@ -11,8 +11,9 @@ public class AuthTask {
     private static TimerTask task;
 
     public static void runNew(boolean once) {
+        HustAuth.log("正在执行登入任务.");
         if (once) {
-            HustAuth.log("强制本次登入任务必须登入一次.");
+            HustAuth.log("强制本次登入任务必须登入一次, 等待认证系统下线.");
         }
         TimerTask newTask = new TimerTask() {
             @Override
@@ -21,7 +22,7 @@ public class AuthTask {
                     if (!once) {
                         HustAuth.log("目前已登入校园网, 终止登入任务.");
                         stop();
-                    } else {
+                    } else if (HustAuth.INS.getConfigManager().getConfigData().verbose) {
                         HustAuth.log("目前已登入校园网, 等待下次执行...");
                     }
                     return;
